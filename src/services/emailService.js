@@ -301,7 +301,7 @@ QuMail System`,
     const file = files[Math.floor(Math.random() * files.length)];
 
     return {
-      id: `att_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `att_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       filename: file.name,
       contentType: file.type,
       size: file.size,

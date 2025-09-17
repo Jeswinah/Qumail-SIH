@@ -51,7 +51,8 @@ class KMService {
    */
   generateMockKey(keyId = null, keySize = 256) {
     const id =
-      keyId || `QK_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`;
+      keyId ||
+      `QK_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
     const keyBytes = keySize / 8;
 
     // Generate random hex key
@@ -76,7 +77,7 @@ class KMService {
   /**
    * Get a quantum key by ID (Mock)
    */
-  async getKey(keyId, additionalOptions = {}) {
+  async getKey(keyId, _additionalOptions = {}) {
     try {
       await new Promise((resolve) => setTimeout(resolve, this.simulateDelay));
 
@@ -127,7 +128,7 @@ class KMService {
   /**
    * Get key status (Mock)
    */
-  async getKeyStatus(keyId) {
+  async getKeyStatus(_keyId) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 200));
 

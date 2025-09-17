@@ -2,7 +2,7 @@ import React from "react";
 import { Mail, Shield, Settings, Search, Plus, RefreshCw } from "lucide-react";
 import { useAppStore } from "../../stores/appStore";
 
-const Header = ({ onCompose, activeView }) => {
+const Header = ({ onCompose }) => {
   const { unreadCount, securityConfig } = useAppStore();
 
   const getSecurityLevelColor = (level) => {

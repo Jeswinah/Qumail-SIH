@@ -86,13 +86,13 @@ const Sidebar = ({ activeView, onViewChange }) => {
     );
   };
 
-  const ConnectionStatus = ({ connected, label, icon: Icon }) => (
+  const ConnectionStatus = ({ connected, label, icon: StatusIcon }) => (
     <div
       className={`flex items-center text-xs px-3 py-2 rounded ${
         connected ? "text-green-700 bg-green-50" : "text-red-700 bg-red-50"
       }`}
     >
-      <Icon className="h-3 w-3 mr-2" />
+      <StatusIcon className="h-3 w-3 mr-2" />
       <span>
         {label}: {connected ? "Connected" : "Disconnected"}
       </span>

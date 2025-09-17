@@ -49,7 +49,7 @@ class EncryptionEngine {
         options.securityLevel || securityService.getCurrentSecurityLevel();
       const encryptionId = `enc_${Date.now()}_${Math.random()
         .toString(36)
-        .substr(2, 9)}`;
+        .substring(2, 11)}`;
 
       console.log(`Encrypting email with security level: ${securityLevel}`);
 
@@ -121,7 +121,7 @@ class EncryptionEngine {
   /**
    * Decrypt email data
    */
-  async decryptEmail(encryptedEmail, options = {}) {
+  async decryptEmail(encryptedEmail, _options = {}) {
     try {
       if (!this.isInitialized) {
         await this.initialize();
