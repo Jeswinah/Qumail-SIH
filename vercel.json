@@ -15,17 +15,5 @@
     }
   ],
   "installCommand": "npm install --legacy-peer-deps",
-  "buildCommand": "npm run build",
-  "env": {
-    "VITE_KM_ENDPOINT": "https://your-project.vercel.app",
-    "VITE_EMAIL_ENDPOINT": "https://your-project.vercel.app"
-  },
-  "functions": {
-    "api/km/[...path].js": {
-      "maxDuration": 10
-    },
-    "api/email/[...path].js": {
-      "maxDuration": 10
-    }
-  }
+  "buildCommand": "npm run build"
 }

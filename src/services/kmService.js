@@ -1,18 +1,15 @@
 /**
- * Key Manager Service - ETSI GS QKD 014 Implementation
- * Handles quantum key distribution and management
+ * Key Manager Service - Frontend Mock Implementation
+ * Provides quantum key simulation without backend dependencies
  */
 
-import axios from "axios";
 import { KM_API_ENDPOINTS, KEY_STATES } from "../types";
 
 class KMService {
   constructor() {
-    this.baseURL = "http://localhost:8080"; // Default KM endpoint
-    this.apiKey = null;
-    this.saeId = null; // Secure Application Entity ID
     this.isConnected = false;
-    this.client = null;
+    this.saeId = "mock_sae_001";
+    this.simulateDelay = 500; // Simulate network delay
   }
 
   /**
@@ -20,37 +17,10 @@ class KMService {
    */
   async initialize() {
     try {
-      // Create axios client with default configuration
-      this.client = axios.create({
-        baseURL: this.baseURL,
-        timeout: 10000,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      });
-
-      // Add request interceptor for authentication
-      this.client.interceptors.request.use(
-        (config) => {
-          if (this.apiKey) {
-            config.headers.Authorization = `Bearer ${this.apiKey}`;
-          }
-          return config;
-        },
-        (error) => Promise.reject(error)
-      );
-
-      // Add response interceptor for error handling
-      this.client.interceptors.response.use(
-        (response) => response,
-        (error) => {
-          console.error("KM API Error:", error.response?.data || error.message);
-          return Promise.reject(error);
-        }
-      );
-
-      console.log("KM Service initialized");
+      // Simulate initialization delay
+      await new Promise((resolve) => setTimeout(resolve, this.simulateDelay));
+      this.isConnected = true;
+      console.log("KM Service initialized (Mock Mode)");
     } catch (error) {
       console.error("Failed to initialize KM Service:", error);
       throw error;
@@ -58,185 +28,178 @@ class KMService {
   }
 
   /**
-   * Configure KM connection
+   * Configure KM connection (Mock)
    */
   async configure(config) {
-    this.baseURL = config.endpoint;
-    this.apiKey = config.apiKey;
-    this.saeId = config.saeId;
-
-    // Update client base URL
-    if (this.client) {
-      this.client.defaults.baseURL = this.baseURL;
-    }
-
-    return this.testConnection();
+    this.saeId = config.saeId || this.saeId;
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    this.isConnected = true;
+    return true;
   }
 
   /**
-   * Test connection to KM
+   * Test connection to KM (Mock)
    */
   async testConnection() {
-    try {
-      // Use a simple health check or status endpoint
-      const response = await this.client.get("/api/v1/status");
-      this.isConnected = response.status === 200;
-      return this.isConnected;
-    } catch (error) {
-      this.isConnected = false;
-      console.error("KM connection test failed:", error);
-      return false;
-    }
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    this.isConnected = true;
+    return true;
   }
 
   /**
-   * Get a quantum key by ID (ETSI GS QKD 014)
+   * Generate mock quantum key
+   */
+  generateMockKey(keyId = null, keySize = 256) {
+    const id =
+      keyId || `QK_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`;
+    const keyBytes = keySize / 8;
+
+    // Generate random hex key
+    let key = "";
+    for (let i = 0; i < keyBytes; i++) {
+      key += Math.floor(Math.random() * 256)
+        .toString(16)
+        .padStart(2, "0");
+    }
+
+    return {
+      key_ID: id,
+      key: key,
+      status: KEY_STATES.AVAILABLE,
+      timestamp: new Date().toISOString(),
+      size: keySize,
+      algorithm: "AES",
+      qkd_path: "mock_qkd_path_001",
+    };
+  }
+
+  /**
+   * Get a quantum key by ID (Mock)
    */
   async getKey(keyId, additionalOptions = {}) {
     try {
-      const endpoint = KM_API_ENDPOINTS.GET_KEY.replace("{key_ID}", keyId);
-      const response = await this.client.get(endpoint, {
-        params: {
-          ...additionalOptions,
-          sae_id: this.saeId,
-        },
-      });
+      await new Promise((resolve) => setTimeout(resolve, this.simulateDelay));
+
+      const key = this.generateMockKey(keyId);
 
       return {
         status: "success",
-        keys: response.data.keys || [response.data],
-        message: "Key retrieved successfully",
+        keys: [key],
+        message: "Key retrieved successfully (Mock)",
       };
     } catch (error) {
       return {
         status: "error",
-        error_code: error.response?.data?.error_code || "KM_ERROR",
-        error_message: error.response?.data?.message || error.message,
+        error_code: "KM_ERROR",
+        error_message: error.message,
         keys: [],
       };
     }
   }
 
   /**
-   * Get key with additional key IDs
+   * Get key with additional key IDs (Mock)
    */
   async getKeyWithIds(keyId, additionalKeyIds = []) {
     try {
-      const endpoint = KM_API_ENDPOINTS.GET_KEY_WITH_IDS.replace(
-        "{key_ID}",
-        keyId
-      );
-      const response = await this.client.post(endpoint, {
-        additional_key_IDs: additionalKeyIds,
-        sae_id: this.saeId,
+      await new Promise((resolve) => setTimeout(resolve, this.simulateDelay));
+
+      const keys = [this.generateMockKey(keyId)];
+      additionalKeyIds.forEach((id) => {
+        keys.push(this.generateMockKey(id));
       });
 
       return {
         status: "success",
-        keys: response.data.keys || [],
-        message: "Keys retrieved successfully",
+        keys: keys,
+        message: "Keys retrieved successfully (Mock)",
       };
     } catch (error) {
       return {
         status: "error",
-        error_code: error.response?.data?.error_code || "KM_ERROR",
-        error_message: error.response?.data?.message || error.message,
+        error_code: "KM_ERROR",
+        error_message: error.message,
         keys: [],
       };
     }
   }
 
   /**
-   * Get key status
+   * Get key status (Mock)
    */
   async getKeyStatus(keyId) {
     try {
-      const endpoint = KM_API_ENDPOINTS.GET_STATUS.replace("{key_ID}", keyId);
-      const response = await this.client.get(endpoint, {
-        params: { sae_id: this.saeId },
-      });
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
       return {
         status: "success",
-        key_status: response.data.status,
-        message: "Key status retrieved successfully",
+        key_status: KEY_STATES.AVAILABLE,
+        message: "Key status retrieved successfully (Mock)",
       };
     } catch (error) {
       return {
         status: "error",
-        error_code: error.response?.data?.error_code || "KM_ERROR",
-        error_message: error.response?.data?.message || error.message,
+        error_code: "KM_ERROR",
+        error_message: error.message,
       };
     }
   }
 
   /**
-   * Request new encryption key
+   * Request new encryption key (Mock)
    */
   async requestEncryptionKey(slaveId, keySize = 256) {
     try {
-      const endpoint = KM_API_ENDPOINTS.ENCODE_KEY.replace(
-        "{slave_SAE_ID}",
-        slaveId
-      );
-      const response = await this.client.post(endpoint, {
-        size: keySize,
-        master_sae_id: this.saeId,
-        algorithm_type: "AES",
-      });
+      await new Promise((resolve) => setTimeout(resolve, this.simulateDelay));
+
+      const key = this.generateMockKey(null, keySize);
 
       return {
         status: "success",
-        keys: response.data.keys || [],
-        message: "Encryption key generated successfully",
+        keys: [key],
+        message: "Encryption key generated successfully (Mock)",
       };
     } catch (error) {
       return {
         status: "error",
-        error_code: error.response?.data?.error_code || "KM_ERROR",
-        error_message: error.response?.data?.message || error.message,
+        error_code: "KM_ERROR",
+        error_message: error.message,
         keys: [],
       };
     }
   }
 
   /**
-   * Request decryption key
+   * Request decryption key (Mock)
    */
   async requestDecryptionKey(slaveId, keyIds) {
     try {
-      const endpoint = KM_API_ENDPOINTS.DECODE_KEY.replace(
-        "{slave_SAE_ID}",
-        slaveId
-      );
-      const response = await this.client.post(endpoint, {
-        key_IDs: Array.isArray(keyIds) ? keyIds : [keyIds],
-        master_sae_id: this.saeId,
-      });
+      await new Promise((resolve) => setTimeout(resolve, this.simulateDelay));
+
+      const keys = Array.isArray(keyIds) ? keyIds : [keyIds];
+      const mockKeys = keys.map((id) => this.generateMockKey(id));
 
       return {
         status: "success",
-        keys: response.data.keys || [],
-        message: "Decryption keys retrieved successfully",
+        keys: mockKeys,
+        message: "Decryption keys retrieved successfully (Mock)",
       };
     } catch (error) {
       return {
         status: "error",
-        error_code: error.response?.data?.error_code || "KM_ERROR",
-        error_message: error.response?.data?.message || error.message,
+        error_code: "KM_ERROR",
+        error_message: error.message,
         keys: [],
       };
     }
   }
 
   /**
-   * Generate quantum keys for One Time Pad encryption
+   * Generate quantum keys for One Time Pad encryption (Mock)
    */
   async generateOTPKeys(dataSize) {
     try {
-      // For OTP, we need key material equal to data size
-      const keySize = Math.ceil(dataSize / 8) * 8; // Round up to byte boundary
-
+      const keySize = Math.ceil(dataSize / 8) * 8;
       const response = await this.requestEncryptionKey(this.saeId, keySize);
 
       if (response.status === "success" && response.keys.length > 0) {
@@ -251,7 +214,7 @@ class KMService {
   }
 
   /**
-   * Get quantum seed for AES encryption
+   * Get quantum seed for AES encryption (Mock)
    */
   async getQuantumSeed(keySize = 256) {
     try {
@@ -293,25 +256,24 @@ class KMService {
   }
 
   /**
-   * Get connection status
+   * Get connection status (Mock)
    */
   getConnectionStatus() {
     return {
       isConnected: this.isConnected,
-      endpoint: this.baseURL,
+      endpoint: "Mock KM Service",
       saeId: this.saeId,
       lastCheck: new Date(),
+      mode: "frontend-only",
     };
   }
 
   /**
-   * Disconnect from KM
+   * Disconnect from KM (Mock)
    */
   disconnect() {
     this.isConnected = false;
-    this.apiKey = null;
-    this.saeId = null;
-    console.log("Disconnected from KM");
+    console.log("Disconnected from KM (Mock)");
   }
 }
 

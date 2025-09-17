@@ -1,15 +1,15 @@
 /**
- * Email Service - Standard Email Protocol Integration
- * Handles IMAP, SMTP connections with Gmail, Yahoo, Outlook, etc.
+ * Email Service - Frontend Mock Implementation
+ * Provides email simulation without backend dependencies
  */
 
 import { EMAIL_PROVIDERS } from "../types";
 
 class EmailService {
   constructor() {
-    this.imapConnections = new Map();
-    this.smtpConnections = new Map();
+    this.accounts = new Map();
     this.isInitialized = false;
+    this.simulateDelay = 500;
   }
 
   /**
@@ -17,10 +17,9 @@ class EmailService {
    */
   async initialize() {
     try {
-      // Since we're in a browser environment, we'll use a proxy approach
-      // or simulate email operations for demonstration purposes
+      await new Promise((resolve) => setTimeout(resolve, 300));
       this.isInitialized = true;
-      console.log("Email Service initialized");
+      console.log("Email Service initialized (Mock Mode)");
     } catch (error) {
       console.error("Failed to initialize Email Service:", error);
       throw error;
@@ -28,7 +27,7 @@ class EmailService {
   }
 
   /**
-   * Configure and test email account connection
+   * Configure and test email account connection (Mock)
    */
   async configureAccount(accountConfig) {
     try {
@@ -37,34 +36,20 @@ class EmailService {
         throw new Error("Invalid account configuration");
       }
 
-      // Test IMAP connection
-      const imapResult = await this.testIMAPConnection(accountConfig);
-      if (!imapResult.success) {
-        throw new Error(`IMAP connection failed: ${imapResult.error}`);
-      }
+      // Simulate connection test delay
+      await new Promise((resolve) => setTimeout(resolve, this.simulateDelay));
 
-      // Test SMTP connection
-      const smtpResult = await this.testSMTPConnection(accountConfig);
-      if (!smtpResult.success) {
-        throw new Error(`SMTP connection failed: ${smtpResult.error}`);
-      }
-
-      // Store connection configuration
-      this.imapConnections.set(accountConfig.id, {
-        config: accountConfig.imap,
+      // Store mock account configuration
+      this.accounts.set(accountConfig.id, {
+        config: accountConfig,
         status: "connected",
         lastActivity: new Date(),
-      });
-
-      this.smtpConnections.set(accountConfig.id, {
-        config: accountConfig.smtp,
-        status: "connected",
-        lastActivity: new Date(),
+        mode: "mock",
       });
 
       return {
         success: true,
-        message: "Email account configured successfully",
+        message: "Email account configured successfully (Mock)",
         accountId: accountConfig.id,
       };
     } catch (error) {
@@ -80,81 +65,51 @@ class EmailService {
    * Validate email account configuration
    */
   validateAccountConfig(config) {
-    const required = ["id", "email", "provider", "imap", "smtp"];
+    const required = ["id", "email", "provider"];
     return required.every((field) => config[field]);
   }
 
   /**
-   * Test IMAP connection
+   * Test IMAP connection (Mock)
    */
   async testIMAPConnection(accountConfig) {
     try {
-      // In a real implementation, this would use the IMAP library
-      // For demo purposes, we'll simulate the connection test
-      console.log(
-        `Testing IMAP connection to ${accountConfig.imap.host}:${accountConfig.imap.port}`
-      );
-
-      // Simulate connection delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Check if it's a known provider
-      const provider = Object.values(EMAIL_PROVIDERS).find(
-        (p) => p.imap.host === accountConfig.imap.host
-      );
-
-      if (provider) {
-        return { success: true, provider: provider.name };
-      }
-
-      // For demo, assume connection succeeds
-      return { success: true, provider: "Custom" };
+      console.log(`Testing IMAP connection (Mock): ${accountConfig.email}`);
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      return { success: true, provider: "Mock Provider" };
     } catch (error) {
       return { success: false, error: error.message };
     }
   }
 
   /**
-   * Test SMTP connection
+   * Test SMTP connection (Mock)
    */
   async testSMTPConnection(accountConfig) {
     try {
-      console.log(
-        `Testing SMTP connection to ${accountConfig.smtp.host}:${accountConfig.smtp.port}`
-      );
-
-      // Simulate connection delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      // Check if it's a known provider
-      const provider = Object.values(EMAIL_PROVIDERS).find(
-        (p) => p.smtp.host === accountConfig.smtp.host
-      );
-
-      if (provider) {
-        return { success: true, provider: provider.name };
-      }
-
-      return { success: true, provider: "Custom" };
+      console.log(`Testing SMTP connection (Mock): ${accountConfig.email}`);
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      return { success: true, provider: "Mock Provider" };
     } catch (error) {
       return { success: false, error: error.message };
     }
   }
 
   /**
-   * Fetch emails from IMAP server
+   * Fetch emails from IMAP server (Mock)
    */
   async fetchEmails(accountId, folder = "INBOX", options = {}) {
     try {
-      const connection = this.imapConnections.get(accountId);
-      if (!connection) {
+      const account = this.accounts.get(accountId);
+      if (!account) {
         throw new Error("Account not configured");
       }
 
-      console.log(`Fetching emails from ${folder} for account ${accountId}`);
+      console.log(
+        `Fetching emails from ${folder} for account ${accountId} (Mock)`
+      );
+      await new Promise((resolve) => setTimeout(resolve, this.simulateDelay));
 
-      // In a real implementation, this would use IMAP to fetch emails
-      // For demo purposes, return mock emails
       const mockEmails = this.generateMockEmails(folder, options.limit || 10);
 
       return {
@@ -174,34 +129,33 @@ class EmailService {
   }
 
   /**
-   * Send email via SMTP
+   * Send email via SMTP (Mock)
    */
   async sendEmail(accountId, emailData) {
     try {
-      const connection = this.smtpConnections.get(accountId);
-      if (!connection) {
+      const account = this.accounts.get(accountId);
+      if (!account) {
         throw new Error("Account not configured");
       }
 
-      console.log(`Sending email from account ${accountId}`);
+      console.log(`Sending email from account ${accountId} (Mock)`);
 
       // Validate email data
       if (!this.validateEmailData(emailData)) {
         throw new Error("Invalid email data");
       }
 
-      // In a real implementation, this would use SMTP to send the email
-      // For demo purposes, simulate sending
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Simulate sending delay
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       const messageId = `<${Date.now()}.${Math.random().toString(
         36
-      )}@qumail.local>`;
+      )}@qumail.mock>`;
 
       return {
         success: true,
         messageId: messageId,
-        message: "Email sent successfully",
+        message: "Email sent successfully (Mock)",
       };
     } catch (error) {
       console.error("Failed to send email:", error);
@@ -357,14 +311,16 @@ QuMail System`,
   }
 
   /**
-   * Get folders for an account
+   * Get folders for an account (Mock)
    */
   async getFolders(accountId) {
     try {
-      const connection = this.imapConnections.get(accountId);
-      if (!connection) {
+      const account = this.accounts.get(accountId);
+      if (!account) {
         throw new Error("Account not configured");
       }
+
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
       // Standard email folders
       const folders = [
@@ -405,16 +361,17 @@ QuMail System`,
   }
 
   /**
-   * Search emails
+   * Search emails (Mock)
    */
   async searchEmails(accountId, searchCriteria) {
     try {
-      console.log(`Searching emails for account ${accountId}:`, searchCriteria);
+      console.log(
+        `Searching emails for account ${accountId} (Mock):`,
+        searchCriteria
+      );
+      await new Promise((resolve) => setTimeout(resolve, 400));
 
-      // In a real implementation, this would use IMAP search
-      // For demo, filter mock emails
       const allEmails = this.generateMockEmails("search", 50);
-
       let filteredEmails = allEmails;
 
       if (searchCriteria.query) {
@@ -441,7 +398,7 @@ QuMail System`,
 
       return {
         success: true,
-        emails: filteredEmails.slice(0, 20), // Limit results
+        emails: filteredEmails.slice(0, 20),
         total: filteredEmails.length,
       };
     } catch (error) {
@@ -454,39 +411,31 @@ QuMail System`,
   }
 
   /**
-   * Get connection status for an account
+   * Get connection status for an account (Mock)
    */
   getConnectionStatus(accountId) {
-    const imapConnection = this.imapConnections.get(accountId);
-    const smtpConnection = this.smtpConnections.get(accountId);
+    const account = this.accounts.get(accountId);
 
     return {
       accountId: accountId,
-      imap: imapConnection
-        ? {
-            status: imapConnection.status,
-            lastActivity: imapConnection.lastActivity,
-          }
+      imap: account
+        ? { status: "connected", lastActivity: account.lastActivity }
         : null,
-      smtp: smtpConnection
-        ? {
-            status: smtpConnection.status,
-            lastActivity: smtpConnection.lastActivity,
-          }
+      smtp: account
+        ? { status: "connected", lastActivity: account.lastActivity }
         : null,
-      isConnected: Boolean(imapConnection && smtpConnection),
+      isConnected: Boolean(account),
+      mode: "mock",
     };
   }
 
   /**
-   * Disconnect account
+   * Disconnect account (Mock)
    */
   async disconnectAccount(accountId) {
     try {
-      this.imapConnections.delete(accountId);
-      this.smtpConnections.delete(accountId);
-
-      console.log(`Disconnected email account: ${accountId}`);
+      this.accounts.delete(accountId);
+      console.log(`Disconnected email account: ${accountId} (Mock)`);
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
