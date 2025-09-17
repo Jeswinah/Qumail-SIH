@@ -1,0 +1,21 @@
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "VITE_KM_ENDPOINT": "https://your-km-service.vercel.app",
+    "VITE_EMAIL_ENDPOINT": "https://your-email-service.vercel.app"
+  }
+}

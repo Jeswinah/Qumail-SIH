@@ -14,7 +14,8 @@
     "mock-email": "node mock-services/email-server.cjs",
     "validate": "node validate.js",
     "demo": "node demo.js",
-    "start-all": "concurrently \"npm run mock-km\" \"npm run mock-email\" \"npm run dev\""
+    "start-all": "concurrently \"npm run mock-km\" \"npm run mock-email\" \"npm run dev\"",
+    "vercel-build": "npm run build"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
